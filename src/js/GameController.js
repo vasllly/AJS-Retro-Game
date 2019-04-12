@@ -1,5 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable class-methods-use-this */
+import themes from './themes';
+
 export default class GameController {
   constructor(gamePlay, stateService) {
     this.gamePlay = gamePlay;
@@ -8,7 +10,7 @@ export default class GameController {
 
   init() {
     // TODO: add event listeners to gamePlay events
-    this.gamePlay.drawUi('prairie');
+    this.gamePlay.drawUi(themes.prairie);
     // TODO: load saved stated from stateService
   }
 
