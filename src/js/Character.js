@@ -1,10 +1,7 @@
 export default class Character {
-  constructor(level, type = 'generic') {
+  constructor(level) {
     this.level = level;
-    this.attack = 0;
-    this.defence = 0;
-    this.health = 50;
-    this.type = type;
+    this.health = 100;
     // TODO: throw error if user use "new Character()"
   }
 }

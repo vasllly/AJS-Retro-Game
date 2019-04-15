@@ -1,4 +1,10 @@
-/* eslint-disable no-unused-vars */
+import Swordsman from './characters/Swordsman';
+import Bowman from './characters/Bowman';
+import Magician from './characters/Magician';
+import Daemon from './characters/Daemon';
+import Undead from './characters/Undead';
+import Vampire from './characters/Vampire';
+
 /**
  * Generates random characters
  *
@@ -6,10 +12,38 @@
  * @param maxLevel max character level
  * @returns Character type children (ex. Magician, Bowman, etc)
  */
+
+function randomGenerator(min, max) {
+  return Math.floor(Math.random() * max) + min;
+}
+
 export function* characterGenerator(allowedTypes, maxLevel) {
   // TODO: write logic here
+  const level = randomGenerator(1, maxLevel);
+  const { type } = allowedTypes[randomGenerator(0, allowedTypes.length)];
+  switch (type) {
+    case 'swordsman': yield new Swordsman(level);
+      break;
+    case 'bowman': yield new Bowman(level);
+      break;
+    case 'magician': yield new Magician(level);
+      break;
+    case 'daemon': yield new Daemon(level);
+      break;
+    case 'undead': yield new Undead(level);
+      break;
+    case 'vampire': yield new Vampire(level);
+      break;
+    default:
+      break;
+  }
 }
 
 export function generateTeam(allowedTypes, maxLevel, characterCount) {
   // TODO: write logic here
+  const team = [];
+  for (let i = 0; i < characterCount; i += 1) {
+    team[i] = characterGenerator(allowedTypes, maxLevel).next().value;
+  }
+  return team;
 }
