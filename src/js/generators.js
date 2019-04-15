@@ -14,12 +14,28 @@ import Vampire from './characters/Vampire';
  */
 
 function randomGenerator(min, max) {
-  return Math.floor(Math.random() * max) + min;
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
+function positionGenerator(xMin, xMax) {
+  return Math.floor(Math.random() * 8) * 8 + randomGenerator(xMin, xMax);
+}
+
+export function positionsGenerator(xMin, xMax, count) {
+  const positions = [];
+  for (let index = 0; index < count; index += 1) {
+    let position = positionGenerator(xMin, xMax);
+    while (positions.indexOf(position) !== -1) {
+      position = positionGenerator(xMin, xMax);
+    }
+    positions.push(position);
+  }
+  return positions;
 }
 
 export function* characterGenerator(allowedTypes, maxLevel) {
   // TODO: write logic here
-  const level = randomGenerator(1, maxLevel);
+  const level = randomGenerator(1, maxLevel + 1);
   const { type } = allowedTypes[randomGenerator(0, allowedTypes.length)];
   switch (type) {
     case 'swordsman': yield new Swordsman(level);
