@@ -20,7 +20,6 @@ export default class GameController {
       { type: 'bowman' },
     ];
     const userTeam = generateTeam(startTypes, 1, 2);
-    console.log(userTeam);
     const userTeamPositions = positionsGenerator(0, 2, 2);
 
     // Создание команды противника
@@ -30,7 +29,6 @@ export default class GameController {
       { type: 'vampire' },
     ];
     const warTeam = generateTeam(warTypes, 1, 2);
-    console.log(warTeam);
     const warTeamPositions = positionsGenerator(6, 8, 2);
 
     // Отрисовка персонажей
