@@ -16,7 +16,7 @@ test('new Bowman don\'t throw Error', () => {
     defence: 25,
     health: 100,
     level: 1,
-    type: 'Bowman',
+    type: 'bowman',
   };
   expect(received).toEqual(expected);
 });
