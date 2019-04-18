@@ -22,3 +22,36 @@ export function calcHealthLevel(health) {
 
   return 'high';
 }
+
+export function generateMessage(character) {
+  return `\u{1F396}${character.level} \u{2694}${character.attack} \u{1F6E1}${character.defence} \u{2764}${character.health}`;
+}
+
+export function getXY(index) {
+  return [index % 8, Math.floor(index / 8)];
+}
+
+export function canWalk(character, cursor) {
+  if (character) {
+    const charXY = getXY(character.position);
+    const cursorXY = getXY(cursor);
+    const dX = Math.abs(charXY[0] - cursorXY[0]);
+    const dY = Math.abs(charXY[1] - cursorXY[1]);
+
+    if (dY === 0 && dX <= character.speed) return true;
+    if (dX === 0 && dY <= character.speed) return true;
+    if (dX === dY && dX <= character.speed) return true;
+  }
+  return false;
+}
+
+export function canAttack(character, cursor) {
+  if (character) {
+    const charXY = getXY(character.position);
+    const cursorXY = getXY(cursor);
+    const dX = Math.abs(charXY[0] - cursorXY[0]);
+    const dY = Math.abs(charXY[1] - cursorXY[1]);
+    if (dX <= character.attackRange && dY <= character.attackRange) return true;
+  }
+  return false;
+}

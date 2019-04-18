@@ -2,6 +2,9 @@ import themes from './themes';
 import PositionedCharacter from './PositionedCharacter';
 import GameState from './GameState';
 import GamePlay from './GamePlay';
+import cursors from './cursors';
+import { generateMessage, canWalk, canAttack } from './utils';
+
 
 export default class GameController {
   constructor(gamePlay, stateService) {
@@ -30,13 +33,16 @@ export default class GameController {
 
   onCellClick(index) {
     // TODO: react to click
+    // Проверка, что сейчас наш ход
     if (this.state.step % 2 === 1) return;
+
+    // Выбор персонажа
     if (this.gamePlay.cells[index].innerHTML !== '') {
       const targetChar = this.allCharacters.filter(character => character.position === index)[0];
       if (['bowman', 'swordsman', 'magician'].includes(targetChar.type)) {
-        if (this.state.selectCell) this.gamePlay.deselectCell(this.state.selectCell);
+        if (this.selectCharacter) this.gamePlay.deselectCell(this.selectCharacter.position);
         this.gamePlay.selectCell(index);
-        this.state.selectCell = index;
+        this.selectCharacter = targetChar;
       } else {
         GamePlay.showError('Нельзя выбрать персонажа противника!');
       }
@@ -47,19 +53,33 @@ export default class GameController {
     // TODO: react to mouse enter
     if (this.gamePlay.cells[index].innerHTML !== '') {
       const targetChar = this.allCharacters.filter(character => character.position === index)[0];
-      this.gamePlay.showCellTooltip(this.generateMessage(targetChar), index);
+
+      // Вывод информации о персонаже
+      this.gamePlay.showCellTooltip(generateMessage(targetChar), index);
+
+      // Визуальный отклик
+      if (['bowman', 'swordsman', 'magician'].includes(targetChar.type)) {
+        this.gamePlay.setCursor(cursors.pointer);
+      } else if (!this.selectCharacter) {
+        this.gamePlay.setCursor(cursors.notallowed);
+      } else if (canAttack(this.selectCharacter, index)) {
+        this.gamePlay.selectCell(index, 'red');
+      }
+    } else if (canWalk(this.selectCharacter, index)) {
+      this.gamePlay.selectCell(index, 'green');
     }
   }
 
   onCellLeave(index) {
     // TODO: react to mouse leave
     if (this.gamePlay.cells[index].innerHTML !== '') {
+      // Скрываем информацию о персонаже
       this.gamePlay.hideCellTooltip(index);
-    }
-  }
 
-  // eslint-disable-next-line class-methods-use-this
-  generateMessage(character) {
-    return `\u{1F396}${character.level} \u{2694}${character.attack} \u{1F6E1}${character.defence} \u{2764}${character.health}`;
+      // Визуальный отклик
+      this.gamePlay.setCursor(cursors.auto);
+      const targetChar = this.allCharacters.filter(character => character.position === index)[0];
+      if (['undead', 'deamon', 'vampire'].includes(targetChar.type)) this.gamePlay.deselectCell(index);
+    } else this.gamePlay.deselectCell(index);
   }
 }

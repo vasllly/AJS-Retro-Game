@@ -1,4 +1,12 @@
-import { calcTileType, calcHealthLevel } from '../src/js/utils';
+import {
+  calcTileType,
+  calcHealthLevel,
+  generateMessage,
+  getXY,
+  canWalk,
+  canAttack,
+} from '../src/js/utils';
+import Bowman from '../src/js/characters/Bowman';
 
 function createTile(size) {
   const tiles = [];
@@ -56,4 +64,83 @@ test('test calcHealthLevel', () => {
   ];
   const expected = ['critical', 'critical', 'normal', 'normal', 'high', 'high', 'high'];
   expect(received).toEqual(expected);
+});
+
+test('test generateMessage for Bowman', () => {
+  const character = new Bowman(1);
+  const received = generateMessage(character);
+  const expected = '🎖1 ⚔25 🛡25 ❤100';
+  expect(received).toBe(expected);
+});
+
+test('test getXY(16)', () => {
+  const received = getXY(16);
+  const expected = [0, 2];
+  expect(received).toEqual(expected);
+});
+
+test('test getXY(35)', () => {
+  const received = getXY(35);
+  const expected = [3, 4];
+  expect(received).toEqual(expected);
+});
+
+test('test canWalk', () => {
+  const character = new Bowman(1);
+  character.position = 16;
+  const received = canWalk(character, 18);
+  const expected = true;
+  expect(received).toBe(expected);
+});
+
+test('test canWalk', () => {
+  const character = new Bowman(1);
+  character.position = 16;
+  const received = canWalk(character, 32);
+  const expected = true;
+  expect(received).toBe(expected);
+});
+
+test('test canWalk', () => {
+  const character = new Bowman(1);
+  character.position = 16;
+  const received = canWalk(character, 34);
+  const expected = true;
+  expect(received).toBe(expected);
+});
+
+test('test canWalk', () => {
+  const character = new Bowman(1);
+  character.position = 16;
+  const received = canWalk(character, 19);
+  const expected = false;
+  expect(received).toBe(expected);
+});
+
+test('test canWalk', () => {
+  const received = canWalk(undefined, 19);
+  const expected = false;
+  expect(received).toBe(expected);
+});
+
+test('test canAttack', () => {
+  const character = new Bowman(1);
+  character.position = 16;
+  const received = canAttack(character, 18);
+  const expected = true;
+  expect(received).toBe(expected);
+});
+
+test('test canAttack', () => {
+  const character = new Bowman(1);
+  character.position = 16;
+  const received = canAttack(character, 19);
+  const expected = false;
+  expect(received).toBe(expected);
+});
+
+test('test canAttack', () => {
+  const received = canAttack(undefined, 19);
+  const expected = false;
+  expect(received).toBe(expected);
 });
