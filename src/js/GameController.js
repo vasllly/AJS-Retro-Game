@@ -12,8 +12,8 @@ export default class GameController {
 
   init() {
     // TODO: add event listeners to gamePlay events
-    this.gamePlay.addCellEnterListener(this.onCellEnter());
-    this.gamePlay.addCellLeaveListener(this.onCellLeave());
+    this.gamePlay.addCellEnterListener(this.onCellEnter.bind(this));
+    this.gamePlay.addCellLeaveListener(this.onCellLeave.bind(this));
 
     // TODO: load saved stated from stateService
     this.gamePlay.drawUi(themes.prairie);
@@ -32,26 +32,22 @@ export default class GameController {
     // TODO: react to click
   }
 
-  onCellEnter() {
+  onCellEnter(index) {
     // TODO: react to mouse enter
-    return (index) => {
-      if (this.gamePlay.cells[index].innerHTML !== '') {
-        this.allCharacters.forEach((character) => {
-          if (character.position === index) {
-            this.gamePlay.showCellTooltip(this.generateMessage(character), index);
-          }
-        });
-      }
-    };
+    if (this.gamePlay.cells[index].innerHTML !== '') {
+      this.allCharacters.forEach((character) => {
+        if (character.position === index) {
+          this.gamePlay.showCellTooltip(this.generateMessage(character), index);
+        }
+      });
+    }
   }
 
-  onCellLeave() {
+  onCellLeave(index) {
     // TODO: react to mouse leave
-    return (index) => {
-      if (this.gamePlay.cells[index].innerHTML !== '') {
-        this.gamePlay.hideCellTooltip(index);
-      }
-    };
+    if (this.gamePlay.cells[index].innerHTML !== '') {
+      this.gamePlay.hideCellTooltip(index);
+    }
   }
 
   generateMessage(character) {
