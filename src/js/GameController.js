@@ -24,11 +24,7 @@ export default class GameController {
 
     // Отрисовка персонажей
     this.allCharacters = [...this.state.userTeam, ...this.state.warTeam];
-    const positions = [];
-    this.allCharacters.forEach((character) => {
-      positions.push(new PositionedCharacter(character, character.position));
-    });
-    this.gamePlay.redrawPositions(positions);
+    this.redrawPositions();
   }
 
   onCellClick(index) {
@@ -46,11 +42,23 @@ export default class GameController {
       } else {
         GamePlay.showError('Нельзя выбрать персонажа противника!');
       }
+    // Перемещение
+    } else if (canWalk(this.selectCharacter, index)) {
+      const oldPosition = this.selectCharacter.position;
+      this.selectCharacter.position = index;
+      this.redrawPositions();
+      this.gamePlay.deselectCell(index);
+      this.gamePlay.deselectCell(oldPosition);
+      this.selectCharacter = undefined;
+      this.state.step += 1;
     }
   }
 
   onCellEnter(index) {
     // TODO: react to mouse enter
+    // Проверка, что сейчас наш ход
+    if (this.state.step % 2 === 1) return;
+
     if (this.gamePlay.cells[index].innerHTML !== '') {
       const targetChar = this.allCharacters.filter(character => character.position === index)[0];
 
@@ -72,6 +80,9 @@ export default class GameController {
 
   onCellLeave(index) {
     // TODO: react to mouse leave
+    // Проверка, что сейчас наш ход
+    if (this.state.step % 2 === 1) return;
+
     if (this.gamePlay.cells[index].innerHTML !== '') {
       // Скрываем информацию о персонаже
       this.gamePlay.hideCellTooltip(index);
@@ -79,7 +90,15 @@ export default class GameController {
       // Визуальный отклик
       this.gamePlay.setCursor(cursors.auto);
       const targetChar = this.allCharacters.filter(character => character.position === index)[0];
-      if (['undead', 'deamon', 'vampire'].includes(targetChar.type)) this.gamePlay.deselectCell(index);
+      if (['undead', 'daemon', 'vampire'].includes(targetChar.type)) this.gamePlay.deselectCell(index);
     } else this.gamePlay.deselectCell(index);
+  }
+
+  redrawPositions() {
+    const positions = [];
+    this.allCharacters.forEach((character) => {
+      positions.push(new PositionedCharacter(character, character.position));
+    });
+    this.gamePlay.redrawPositions(positions);
   }
 }
