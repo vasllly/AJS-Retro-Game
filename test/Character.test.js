@@ -13,9 +13,11 @@ test('new Bowman don\'t throw Error', () => {
   const received = new Bowman(1);
   const expected = {
     attack: 25,
+    attackRange: 2,
     defence: 25,
     health: 100,
     level: 1,
+    speed: 2,
     type: 'bowman',
   };
   expect(received).toEqual(expected);
