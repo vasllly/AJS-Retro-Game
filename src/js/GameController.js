@@ -12,42 +12,49 @@ export default class GameController {
 
   init() {
     // TODO: add event listeners to gamePlay events
-    this.gamePlay.addCellEnterListener(this.onCellEnter);
-    this.gamePlay.addCellLeaveListener(this.onCellLeave);
+    this.gamePlay.addCellEnterListener(this.onCellEnter());
+    this.gamePlay.addCellLeaveListener(this.onCellLeave());
 
     // TODO: load saved stated from stateService
     this.gamePlay.drawUi(themes.prairie);
-    const state = GameState.from(this.stateService.load());
+    this.state = GameState.from(this.stateService.load());
 
     // Отрисовка персонажей
-    const characters = [];
-    state.userTeam.forEach((character) => {
-      characters.push(new PositionedCharacter(character, character.position));
+    this.allCharacters = [...this.state.userTeam, ...this.state.warTeam];
+    const positions = [];
+    this.allCharacters.forEach((character) => {
+      positions.push(new PositionedCharacter(character, character.position));
     });
-    state.warTeam.forEach((character) => {
-      characters.push(new PositionedCharacter(character, character.position));
-    });
-    this.gamePlay.redrawPositions(characters);
+    this.gamePlay.redrawPositions(positions);
   }
 
   onCellClick(index) {
     // TODO: react to click
   }
 
-  onCellEnter(index) {
+  onCellEnter() {
     // TODO: react to mouse enter
-    // const message = `${avatars[object.type] ? avatars[object.type] : ''}
-    // ${object.name.charAt(0)}(${object.level}) \u{2694}${object.attack}
-    // \u{1F6E1}${object.defence} \u{2764}${object.health}`;
-    if (this.cells[index].innerHTML !== '') {
-      this.showCellTooltip('Hi', index);
-    }
+    return (index) => {
+      if (this.gamePlay.cells[index].innerHTML !== '') {
+        this.allCharacters.forEach((character) => {
+          if (character.position === index) {
+            this.gamePlay.showCellTooltip(this.generateMessage(character), index);
+          }
+        });
+      }
+    };
   }
 
-  onCellLeave(index) {
+  onCellLeave() {
     // TODO: react to mouse leave
-    if (this.cells[index].innerHTML !== '') {
-      this.hideCellTooltip(index);
-    }
+    return (index) => {
+      if (this.gamePlay.cells[index].innerHTML !== '') {
+        this.gamePlay.hideCellTooltip(index);
+      }
+    };
+  }
+
+  generateMessage(character) {
+    return `\u{1F396}${character.level} \u{2694}${character.attack} \u{1F6E1}${character.defence} \u{2764}${character.health}`;
   }
 }
