@@ -23,7 +23,6 @@ export default class GameController {
     this.state = GameState.from(this.stateService.load());
 
     // Отрисовка персонажей
-    this.allCharacters = [...this.state.userTeam, ...this.state.warTeam];
     this.redrawPositions();
   }
 
@@ -34,23 +33,20 @@ export default class GameController {
 
     // Выбор персонажа
     if (this.gamePlay.cells[index].innerHTML !== '') {
-      const targetChar = this.allCharacters.filter(character => character.position === index)[0];
+      const targetChar = this.targetChar(index);
       if (['bowman', 'swordsman', 'magician'].includes(targetChar.type)) {
         if (this.selectCharacter) this.gamePlay.deselectCell(this.selectCharacter.position);
         this.gamePlay.selectCell(index);
         this.selectCharacter = targetChar;
+      // Атака
+      } else if (canAttack(this.selectCharacter, index)) {
+        this.attacked(index);
       } else {
         GamePlay.showError('Нельзя выбрать персонажа противника!');
       }
     // Перемещение
     } else if (canWalk(this.selectCharacter, index)) {
-      const oldPosition = this.selectCharacter.position;
-      this.selectCharacter.position = index;
-      this.redrawPositions();
-      this.gamePlay.deselectCell(index);
-      this.gamePlay.deselectCell(oldPosition);
-      this.selectCharacter = undefined;
-      this.state.step += 1;
+      this.moved(index);
     }
   }
 
@@ -60,7 +56,7 @@ export default class GameController {
     if (this.state.step % 2 === 1) return;
 
     if (this.gamePlay.cells[index].innerHTML !== '') {
-      const targetChar = this.allCharacters.filter(character => character.position === index)[0];
+      const targetChar = this.targetChar(index);
 
       // Вывод информации о персонаже
       this.gamePlay.showCellTooltip(generateMessage(targetChar), index);
@@ -89,16 +85,51 @@ export default class GameController {
 
       // Визуальный отклик
       this.gamePlay.setCursor(cursors.auto);
-      const targetChar = this.allCharacters.filter(character => character.position === index)[0];
+      const targetChar = this.targetChar(index);
       if (['undead', 'daemon', 'vampire'].includes(targetChar.type)) this.gamePlay.deselectCell(index);
     } else this.gamePlay.deselectCell(index);
   }
 
+  targetChar(index) {
+    const allCharacters = [...this.state.userTeam, ...this.state.warTeam];
+    return allCharacters.filter(character => character.position === index)[0];
+  }
+
   redrawPositions() {
     const positions = [];
-    this.allCharacters.forEach((character) => {
+    [...this.state.userTeam, ...this.state.warTeam].forEach((character) => {
       positions.push(new PositionedCharacter(character, character.position));
     });
     this.gamePlay.redrawPositions(positions);
+  }
+
+  moved(index) {
+    // this.state.step += 1;
+    const oldPosition = this.selectCharacter.position;
+    this.selectCharacter.position = index;
+    this.redrawPositions();
+    this.gamePlay.deselectCell(index);
+    this.gamePlay.deselectCell(oldPosition);
+    this.selectCharacter = undefined;
+  }
+
+  async attacked(index) {
+    // Переход на следующий шаг
+    // this.state.step += 1;
+    this.gamePlay.deselectCell(index);
+    this.gamePlay.deselectCell(this.selectCharacter.position);
+
+    // Расчет атаки
+    const target = this.targetChar(index);
+    const { attack } = this.selectCharacter;
+    const damage = Math.max(attack - target.defence, attack * 0.1);
+    this.selectCharacter = undefined;
+
+    // Атака
+    await this.gamePlay.showDamage(index, damage).then();
+    target.health -= damage;
+
+    // Отрисовка
+    this.redrawPositions();
   }
 }
