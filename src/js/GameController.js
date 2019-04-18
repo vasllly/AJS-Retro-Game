@@ -35,11 +35,8 @@ export default class GameController {
   onCellEnter(index) {
     // TODO: react to mouse enter
     if (this.gamePlay.cells[index].innerHTML !== '') {
-      this.allCharacters.forEach((character) => {
-        if (character.position === index) {
-          this.gamePlay.showCellTooltip(this.generateMessage(character), index);
-        }
-      });
+      const targetChar = this.allCharacters.filter(character => character.position === index)[0];
+      this.gamePlay.showCellTooltip(this.generateMessage(targetChar), index);
     }
   }
 
