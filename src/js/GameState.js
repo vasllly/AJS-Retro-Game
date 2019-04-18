@@ -19,6 +19,7 @@ export default class GameState {
       return {
         userTeam: this.positioning('user', new Team('user', 1, 2).team),
         warTeam: this.positioning('war', new Team('war', 1, 2).team),
+        step: 0,
       };
     }
     return null;
