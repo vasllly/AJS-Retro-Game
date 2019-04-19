@@ -108,6 +108,9 @@ export default class GameController {
   }
 
   moved(index) {
+    // Переход на следующий шаг
+    this.state.step += 1;
+
     // Сохранение старой позиции для очистки ячейки
     const oldPosition = this.selectCharacter.position;
 
@@ -116,9 +119,6 @@ export default class GameController {
 
     // Отрисовка
     this.redrawPositions();
-
-    // Переход на следующий шаг
-    // this.state.step += 1;
     this.gamePlay.deselectCell(index);
     this.gamePlay.deselectCell(oldPosition);
     this.gamePlay.setCursor(cursors.auto);
@@ -126,6 +126,9 @@ export default class GameController {
   }
 
   async attacked(index) {
+    // Переход на следующий шаг
+    this.state.step += 1;
+
     // Расчет атаки
     const target = this.targetChar(index);
     const { attack } = this.selectCharacter;
@@ -136,13 +139,10 @@ export default class GameController {
     target.health -= damage;
 
     // Отрисовка
-    this.redrawPositions();
-
-    // Переход на следующий шаг
-    // this.state.step += 1;
     this.gamePlay.deselectCell(index);
     this.gamePlay.deselectCell(this.selectCharacter.position);
     this.gamePlay.setCursor(cursors.auto);
     this.selectCharacter = undefined;
+    this.redrawPositions();
   }
 }
