@@ -5,8 +5,11 @@ import {
   getXY,
   canWalk,
   canAttack,
+  changeСursor,
+  changeCell,
 } from '../src/js/utils';
 import Bowman from '../src/js/characters/Bowman';
+import Daemon from '../src/js/characters/Daemon';
 
 function createTile(size) {
   const tiles = [];
@@ -142,5 +145,177 @@ test('test canAttack', () => {
 test('test canAttack', () => {
   const received = canAttack(undefined, 19);
   const expected = false;
+  expect(received).toBe(expected);
+});
+
+test('test changeСursor select=none, target=none', () => {
+  const selectedCharacter = undefined;
+  const cursorPosition = 0;
+  const targetChar = undefined;
+  const received = changeСursor(selectedCharacter, cursorPosition, targetChar);
+  const expected = 'auto';
+  expect(received).toBe(expected);
+});
+
+test('test changeСursor select=none, target=war', () => {
+  const selectedCharacter = undefined;
+  const cursorPosition = 0;
+  const targetChar = new Daemon(1);
+  const received = changeСursor(selectedCharacter, cursorPosition, targetChar);
+  const expected = 'notallowed';
+  expect(received).toBe(expected);
+});
+
+test('test changeСursor select=none, target=user', () => {
+  const selectedCharacter = undefined;
+  const cursorPosition = 0;
+  const targetChar = new Bowman(1);
+  const received = changeСursor(selectedCharacter, cursorPosition, targetChar);
+  const expected = 'pointer';
+  expect(received).toBe(expected);
+});
+
+test('test changeСursor select=user, target=user', () => {
+  const selectedCharacter = new Bowman(1);
+  selectedCharacter.position = 0;
+  const cursorPosition = 0;
+  const targetChar = selectedCharacter;
+  const received = changeСursor(selectedCharacter, cursorPosition, targetChar);
+  const expected = 'pointer';
+  expect(received).toBe(expected);
+});
+
+test('test changeСursor select=user, target=user2', () => {
+  const selectedCharacter = new Bowman(1);
+  const cursorPosition = 0;
+  const targetChar = new Bowman(2);
+  const received = changeСursor(selectedCharacter, cursorPosition, targetChar);
+  const expected = 'pointer';
+  expect(received).toBe(expected);
+});
+
+test('test changeСursor select=user, target=canAction', () => {
+  const selectedCharacter = new Bowman(1);
+  selectedCharacter.position = 0;
+  const cursorPosition = 3;
+  const targetChar = undefined;
+  const received = changeСursor(selectedCharacter, cursorPosition, targetChar);
+  const expected = 'notallowed';
+  expect(received).toBe(expected);
+});
+
+test('test changeСursor select=user, target=canDistanceToWar', () => {
+  const selectedCharacter = new Bowman(1);
+  selectedCharacter.position = 0;
+  const targetChar = new Daemon();
+  targetChar.position = 7;
+  const received = changeСursor(selectedCharacter, targetChar.position, targetChar);
+  const expected = 'notallowed';
+  expect(received).toBe(expected);
+});
+
+test('test changeСursor select=user, target=canWalk', () => {
+  const selectedCharacter = new Bowman(1);
+  selectedCharacter.position = 0;
+  const cursorPosition = 2;
+  const targetChar = undefined;
+  const received = changeСursor(selectedCharacter, cursorPosition, targetChar);
+  const expected = 'pointer';
+  expect(received).toBe(expected);
+});
+
+test('test changeСursor select=user, target=canAttack', () => {
+  const selectedCharacter = new Bowman(1);
+  selectedCharacter.position = 0;
+  const targetChar = new Daemon();
+  targetChar.position = 2;
+  const received = changeСursor(selectedCharacter, targetChar.position, targetChar);
+  const expected = 'crosshair';
+  expect(received).toBe(expected);
+});
+
+test('test changeCell select=none, target=none', () => {
+  const selectedCharacter = undefined;
+  const cursorPosition = 0;
+  const targetChar = undefined;
+  const received = changeCell(selectedCharacter, cursorPosition, targetChar);
+  const expected = false;
+  expect(received).toBe(expected);
+});
+
+test('test changeCell select=none, target=war', () => {
+  const selectedCharacter = undefined;
+  const cursorPosition = 0;
+  const targetChar = new Daemon(1);
+  const received = changeCell(selectedCharacter, cursorPosition, targetChar);
+  const expected = false;
+  expect(received).toBe(expected);
+});
+
+test('test changeCell select=none, target=user', () => {
+  const selectedCharacter = undefined;
+  const cursorPosition = 0;
+  const targetChar = new Bowman(1);
+  const received = changeCell(selectedCharacter, cursorPosition, targetChar);
+  const expected = false;
+  expect(received).toBe(expected);
+});
+
+test('test changeCell select=user, target=user', () => {
+  const selectedCharacter = new Bowman(1);
+  selectedCharacter.position = 0;
+  const cursorPosition = 0;
+  const targetChar = selectedCharacter;
+  const received = changeCell(selectedCharacter, cursorPosition, targetChar);
+  const expected = false;
+  expect(received).toBe(expected);
+});
+
+test('test changeCell select=user, target=user2', () => {
+  const selectedCharacter = new Bowman(1);
+  const cursorPosition = 0;
+  const targetChar = new Bowman(2);
+  const received = changeCell(selectedCharacter, cursorPosition, targetChar);
+  const expected = false;
+  expect(received).toBe(expected);
+});
+
+test('test changeCell select=user, target=canAction', () => {
+  const selectedCharacter = new Bowman(1);
+  selectedCharacter.position = 0;
+  const cursorPosition = 3;
+  const targetChar = undefined;
+  const received = changeCell(selectedCharacter, cursorPosition, targetChar);
+  const expected = false;
+  expect(received).toBe(expected);
+});
+
+test('test changeCell select=user, target=canDistanceToWar', () => {
+  const selectedCharacter = new Bowman(1);
+  selectedCharacter.position = 0;
+  const targetChar = new Daemon();
+  targetChar.position = 7;
+  const received = changeCell(selectedCharacter, targetChar.position, targetChar);
+  const expected = false;
+  expect(received).toBe(expected);
+});
+
+test('test changeCell select=user, target=canWalk', () => {
+  const selectedCharacter = new Bowman(1);
+  selectedCharacter.position = 0;
+  const cursorPosition = 2;
+  const targetChar = undefined;
+  const received = changeCell(selectedCharacter, cursorPosition, targetChar);
+  const expected = 'green';
+  expect(received).toBe(expected);
+});
+
+test('test changeCell select=user, target=canAttack', () => {
+  const selectedCharacter = new Bowman(1);
+  selectedCharacter.position = 0;
+  const targetChar = new Daemon();
+  targetChar.position = 2;
+  const received = changeCell(selectedCharacter, targetChar.position, targetChar);
+  const expected = 'red';
   expect(received).toBe(expected);
 });

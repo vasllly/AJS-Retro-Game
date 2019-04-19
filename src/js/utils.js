@@ -55,3 +55,26 @@ export function canAttack(character, cursor) {
   }
   return false;
 }
+
+export function changeСursor(selectedCharacter, cursorPosition, targetChar) {
+  let cursorType = 'auto';
+  if (targetChar && ['undead', 'daemon', 'vampire'].includes(targetChar.type)) cursorType = 'notallowed';
+  if (selectedCharacter) {
+    if (selectedCharacter.position !== cursorPosition) cursorType = 'notallowed';
+    if (!targetChar && canWalk(selectedCharacter, cursorPosition)) cursorType = 'pointer';
+    if (targetChar && ['undead', 'daemon', 'vampire'].includes(targetChar.type) && canAttack(selectedCharacter, cursorPosition)) cursorType = 'crosshair';
+  }
+  if (targetChar && ['bowman', 'swordsman', 'magician'].includes(targetChar.type)) cursorType = 'pointer';
+  return cursorType;
+}
+
+export function changeCell(selectedCharacter, cursorPosition, targetChar) {
+  let cellType = false;
+  if (selectedCharacter) {
+    if (selectedCharacter.position !== cursorPosition) cellType = false;
+    if (!targetChar && canWalk(selectedCharacter, cursorPosition)) cellType = 'green';
+    if (targetChar && ['undead', 'daemon', 'vampire'].includes(targetChar.type) && canAttack(selectedCharacter, cursorPosition)) cellType = 'red';
+  }
+  if (selectedCharacter === targetChar) cellType = false;
+  return cellType;
+}
