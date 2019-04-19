@@ -4,12 +4,12 @@ import { positionsGenerator } from './generators';
 export default class GameState {
   static positioning(type, team) {
     let positions = [];
-    if (type === 'user') positions = positionsGenerator(0, 2, team.length);
-    if (type === 'war') positions = positionsGenerator(6, 8, team.length);
-    for (let index = 0; index < team.length; index += 1) {
+    if (type === 'user') positions = positionsGenerator(0, 2, [...team].length);
+    if (type === 'war') positions = positionsGenerator(6, 8, [...team].length);
+    [...team].forEach((character, index) => {
       // eslint-disable-next-line no-param-reassign
-      team[index].position = positions[index];
-    }
+      character.position = positions[index];
+    });
     return team;
   }
 
@@ -17,8 +17,8 @@ export default class GameState {
     // TODO: create object
     if (JSON.stringify(object) === JSON.stringify({})) {
       return {
-        userTeam: this.positioning('user', new Team('user', 1, 2).team),
-        warTeam: this.positioning('war', new Team('war', 1, 2).team),
+        userTeam: this.positioning('user', new Team('user', 1, 2)),
+        warTeam: this.positioning('war', new Team('war', 1, 2)),
         step: 0,
       };
     }

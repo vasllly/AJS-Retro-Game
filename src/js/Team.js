@@ -16,4 +16,10 @@ export default class Team {
       ], maxLevel, characterCount);
     }
   }
+
+  * [Symbol.iterator]() {
+    // сортировка по степени опасности
+    this.team.sort((chA, chB) => chB.attack + chB.attackRange - chA.attack - chA.attackRange);
+    for (let i = 0; i < this.team.length; i += 1) yield this.team[i];
+  }
 }
