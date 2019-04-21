@@ -10,7 +10,7 @@ export default class GameState {
         warTeam: positioning('war', new Team('war', 1, 2)),
         step: 0,
         score: 0,
-        maxScore: 0,
+        hiScore: 0,
         level: 1,
       };
     }

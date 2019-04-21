@@ -26,9 +26,23 @@ export default class GameController {
     this.gamePlay.addCellEnterListener(this.onCellEnter.bind(this));
     this.gamePlay.addCellLeaveListener(this.onCellLeave.bind(this));
     this.gamePlay.addCellClickListener(this.onCellClick.bind(this));
+    this.gamePlay.addNewGameListener(this.newGame.bind(this));
 
     // TODO: load saved stated from stateService
     this.state = GameState.from(this.stateService.load());
+
+    // Отрисовка поля
+    this.gamePlay.drawUi(themes.prairie);
+
+    // Отрисовка персонажей
+    this.redrawPositions();
+  }
+
+  newGame() {
+    // TODO: load saved stated from stateService
+    const { hiScore } = this.state;
+    this.state = GameState.from({});
+    this.state.hiScore = hiScore;
 
     // Отрисовка поля
     this.gamePlay.drawUi(themes.prairie);
@@ -127,12 +141,9 @@ export default class GameController {
     this.state.userTeam.filter();
     this.state.warTeam.filter();
 
+    // Закончен ли уровень?
     if (this.state.warTeam.count() === 0) this.nextLevel();
-
-    if (this.state.userTeam.count() === 0) {
-      this.state.step = 1;
-      alert('Game over!');
-    }
+    if (this.state.userTeam.count() === 0) this.gameOver();
 
     // Отрисовка персонажей
     this.redrawPositions();
@@ -211,39 +222,53 @@ export default class GameController {
   }
 
   nextLevel() {
-    [...this.state.userTeam].forEach((character) => {
-      // Начисление очков
-      this.state.score += character.health;
+    if (this.state.level === 4) {
+      this.gameOver('win');
+    } else {
+      [...this.state.userTeam].forEach((character) => {
+        // Начисление очков
+        this.state.score += character.health;
 
-      // level up выживших персонажей
-      character.level += 1;
-      character.health = Math.min(character.health + 80, 100);
-      const attackAfter = character.attack * (1.8 - character.health / 100);
-      character.attack = Math.max(character.attack, attackAfter);
-    });
+        // level up выживших персонажей
+        character.level += 1;
+        character.health = Math.min(character.health + 80, 100);
+        const attackAfter = character.attack * (1.8 - character.health / 100);
+        character.attack = Math.max(character.attack, attackAfter);
+      });
 
-    // генерация дополнительных персонажей пользователя
-    const userTypes = [
-      { type: 'swordsman' },
-      { type: 'bowman' },
-      { type: 'magician' },
-    ];
-    const countNewUsers = Math.min(this.state.level, 2);
-    const newMembers = generateTeam(userTypes, this.state.level, countNewUsers);
-    this.state.userTeam.team = [...this.state.userTeam.team, ...newMembers];
-    this.state.userTeam = positioning('user', this.state.userTeam);
+      // генерация дополнительных персонажей пользователя
+      const userTypes = [
+        { type: 'swordsman' },
+        { type: 'bowman' },
+        { type: 'magician' },
+      ];
+      const countNewUsers = Math.min(this.state.level, 2);
+      const newMembers = generateTeam(userTypes, this.state.level, countNewUsers);
+      this.state.userTeam.team = [...this.state.userTeam.team, ...newMembers];
+      this.state.userTeam = positioning('user', this.state.userTeam);
 
-    // Переход на следующий уровень
-    this.state.level += 1;
+      // Переход на следующий уровень
+      this.state.level += 1;
 
-    // Генерация новой вражеской команды
-    this.state.warTeam = positioning('war', new Team('war', this.state.level, this.state.userTeam.count()));
+      // Генерация новой вражеской команды
+      this.state.warTeam = positioning('war', new Team('war', this.state.level, this.state.userTeam.count()));
 
-    // Отрисовка следующего уровня
-    const levels = ['', 'prairie', 'desert', 'arctic', 'mountain'];
-    this.gamePlay.drawUi(themes[levels[this.state.level]]);
+      // Отрисовка следующего уровня
+      const levels = ['', 'prairie', 'desert', 'arctic', 'mountain'];
+      this.gamePlay.drawUi(themes[levels[this.state.level]]);
 
-    // Обнуление шагов
-    this.state.step = 0;
+      // Обнуление шагов
+      this.state.step = 0;
+    }
+  }
+
+  gameOver(status) {
+    this.state.step = 1;
+    if (this.state.score > this.state.hiScore) this.state.hiScore = this.state.score;
+    if (status === 'win') {
+      GamePlay.showMessage(`You win! Your score: ${this.state.score}`);
+    } else {
+      GamePlay.showMessage(`You loss! Your score: ${this.state.score}`);
+    }
   }
 }
