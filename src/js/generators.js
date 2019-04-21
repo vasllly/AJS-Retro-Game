@@ -63,3 +63,14 @@ export function generateTeam(allowedTypes, maxLevel, characterCount) {
   }
   return team;
 }
+
+export function positioning(type, team) {
+  let positions = [];
+  if (type === 'user') positions = positionsGenerator(0, 2, [...team].length);
+  if (type === 'war') positions = positionsGenerator(6, 8, [...team].length);
+  [...team].forEach((character, index) => {
+    // eslint-disable-next-line no-param-reassign
+    character.position = positions[index];
+  });
+  return team;
+}

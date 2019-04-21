@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import themes from './themes';
 import PositionedCharacter from './PositionedCharacter';
 import GameState from './GameState';
@@ -11,7 +12,8 @@ import {
   changeCell,
   getXY,
 } from './utils';
-
+import Team from './Team';
+import { generateTeam, positioning } from './generators';
 
 export default class GameController {
   constructor(gamePlay, stateService) {
@@ -122,15 +124,12 @@ export default class GameController {
     this.selectCharacter = undefined;
 
     // Удаление мертвых персонажей
-    this.state.userTeam = [...this.state.userTeam].filter(character => character.health > 0);
-    this.state.warTeam = [...this.state.warTeam].filter(character => character.health > 0);
+    this.state.userTeam.filter();
+    this.state.warTeam.filter();
 
-    if ([...this.state.warTeam].length === 0) {
-      this.state.step = 0;
-      alert('You win!');
-    }
+    if (this.state.warTeam.count() === 0) this.nextLevel();
 
-    if ([...this.state.userTeam].length === 0) {
+    if (this.state.userTeam.count() === 0) {
       this.state.step = 1;
       alert('Game over!');
     }
@@ -209,5 +208,42 @@ export default class GameController {
       const target = warСoordinates[0] + warСoordinates[1] * 8;
       this.moved(target);
     }
+  }
+
+  nextLevel() {
+    [...this.state.userTeam].forEach((character) => {
+      // Начисление очков
+      this.state.score += character.health;
+
+      // level up выживших персонажей
+      character.level += 1;
+      character.health = Math.min(character.health + 80, 100);
+      const attackAfter = character.attack * (1.8 - character.health / 100);
+      character.attack = Math.max(character.attack, attackAfter);
+    });
+
+    // генерация дополнительных персонажей пользователя
+    const userTypes = [
+      { type: 'swordsman' },
+      { type: 'bowman' },
+      { type: 'magician' },
+    ];
+    const countNewUsers = Math.min(this.state.level, 2);
+    const newMembers = generateTeam(userTypes, this.state.level, countNewUsers);
+    this.state.userTeam.team = [...this.state.userTeam.team, ...newMembers];
+    this.state.userTeam = positioning('user', this.state.userTeam);
+
+    // Переход на следующий уровень
+    this.state.level += 1;
+
+    // Генерация новой вражеской команды
+    this.state.warTeam = positioning('war', new Team('war', this.state.level, this.state.userTeam.count()));
+
+    // Отрисовка следующего уровня
+    const levels = ['', 'prairie', 'desert', 'arctic', 'mountain'];
+    this.gamePlay.drawUi(themes[levels[this.state.level]]);
+
+    // Обнуление шагов
+    this.state.step = 0;
   }
 }

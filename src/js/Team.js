@@ -22,4 +22,12 @@ export default class Team {
     this.team.sort((chA, chB) => chB.attack + chB.attackRange - chA.attack - chA.attackRange);
     for (let i = 0; i < this.team.length; i += 1) yield this.team[i];
   }
+
+  filter() {
+    this.team = this.team.filter(character => character.health > 0);
+  }
+
+  count() {
+    return this.team.length;
+  }
 }
