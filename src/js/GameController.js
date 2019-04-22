@@ -234,7 +234,9 @@ export default class GameController {
 
   nextLevel() {
     if (this.state.level === 4) {
-      this.gameOver('win');
+      // this.gameOver('win');
+      this.state.level = 3;
+      this.nextLevel();
     } else {
       [...this.state.userTeam].forEach((character) => {
         // Начисление очков
