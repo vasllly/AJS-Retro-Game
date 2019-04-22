@@ -19,6 +19,7 @@ export default class GameController {
   constructor(gamePlay, stateService) {
     this.gamePlay = gamePlay;
     this.stateService = stateService;
+    this.levels = ['', 'prairie', 'desert', 'arctic', 'mountain'];
   }
 
   init() {
@@ -55,7 +56,7 @@ export default class GameController {
     this.state = GameState.from(this.stateService.load());
 
     // Отрисовка поля
-    this.gamePlay.drawUi(themes.prairie);
+    this.gamePlay.drawUi(themes.this.levels[this.state.level]);
 
     // Отрисовка персонажей
     this.redrawPositions();
@@ -266,8 +267,7 @@ export default class GameController {
       this.state.warTeam = positioning('war', new Team('war', this.state.level, this.state.userTeam.count()));
 
       // Отрисовка следующего уровня
-      const levels = ['', 'prairie', 'desert', 'arctic', 'mountain'];
-      this.gamePlay.drawUi(themes[levels[this.state.level]]);
+      this.gamePlay.drawUi(themes[this.levels[this.state.level]]);
 
       // Обнуление шагов
       this.state.step = 0;
