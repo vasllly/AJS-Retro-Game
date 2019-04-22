@@ -56,7 +56,7 @@ export default class GameController {
     this.state = GameState.from(this.stateService.load());
 
     // Отрисовка поля
-    this.gamePlay.drawUi(themes.this.levels[this.state.level]);
+    this.gamePlay.drawUi(this.levels[this.state.level]);
 
     // Отрисовка персонажей
     this.redrawPositions();
