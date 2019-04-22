@@ -37,7 +37,7 @@ export default class GameController {
   newGame() {
     // TODO: load saved stated from stateService
     const { hiScore } = this.state;
-    this.state = GameState.from({});
+    this.state = GameState.from();
     this.state.hiScore = hiScore;
 
     // Отрисовка поля
