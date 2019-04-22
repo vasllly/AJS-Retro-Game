@@ -27,9 +27,18 @@ export default class GameController {
     this.gamePlay.addCellLeaveListener(this.onCellLeave.bind(this));
     this.gamePlay.addCellClickListener(this.onCellClick.bind(this));
     this.gamePlay.addNewGameListener(this.newGame.bind(this));
+    this.gamePlay.addSaveGameListener(this.saveGame.bind(this));
+    this.gamePlay.addLoadGameListener(this.loadGame.bind(this));
 
     // TODO: load saved stated from stateService
-    this.state = GameState.from(this.stateService.load());
+    this.loadGame();
+  }
+
+  newGame() {
+    // TODO: load saved stated from stateService
+    const { hiScore } = this.state;
+    this.state = GameState.from({});
+    this.state.hiScore = hiScore;
 
     // Отрисовка поля
     this.gamePlay.drawUi(themes.prairie);
@@ -38,11 +47,12 @@ export default class GameController {
     this.redrawPositions();
   }
 
-  newGame() {
-    // TODO: load saved stated from stateService
-    const { hiScore } = this.state;
-    this.state = GameState.from({});
-    this.state.hiScore = hiScore;
+  saveGame() {
+    this.stateService.save(this.state);
+  }
+
+  loadGame() {
+    this.state = GameState.from(this.stateService.load());
 
     // Отрисовка поля
     this.gamePlay.drawUi(themes.prairie);
@@ -234,6 +244,8 @@ export default class GameController {
         character.health = Math.min(character.health + 80, 100);
         const attackAfter = character.attack * (1.8 - character.health / 100);
         character.attack = Math.max(character.attack, attackAfter);
+        const defenceAfter = character.defence * (1.8 - character.health / 100);
+        character.defence = Math.max(character.defence, defenceAfter);
       });
 
       // генерация дополнительных персонажей пользователя
