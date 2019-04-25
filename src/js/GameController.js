@@ -65,7 +65,7 @@ export default class GameController {
   onCellClick(index) {
     // TODO: react to click
     // Проверка, что сейчас наш ход
-    if (this.state.step % 2 === 1) return;
+    if (this.block) return;
 
     // Инициируем персонажа
     const targetChar = this.targetChar(index);
@@ -90,7 +90,7 @@ export default class GameController {
   onCellEnter(index) {
     // TODO: react to mouse enter
     // Проверка, что сейчас наш ход
-    if (this.state.step % 2 === 1) return;
+    if (this.block) return;
 
     // Инициируем персонажа
     const targetChar = this.targetChar(index);
@@ -110,7 +110,7 @@ export default class GameController {
   onCellLeave(index) {
     // TODO: react to mouse leave
     // Проверка, что сейчас наш ход
-    if (this.state.step % 2 === 1) return;
+    if (this.block) return;
 
     // Инициируем персонажа
     const targetChar = this.targetChar(index);
@@ -186,6 +186,7 @@ export default class GameController {
   }
 
   computerResponse() {
+    this.block = true;
     // eslint-disable-next-line prefer-destructuring
     this.selectCharacter = [...this.state.warTeam][0];
     this.gamePlay.selectCell(this.selectCharacter.position);
@@ -194,42 +195,42 @@ export default class GameController {
       this.gamePlay.selectCell(characterUser.position, 'red');
       this.attacked(characterUser.position);
     } else {
-      const warСoordinates = getXY(this.selectCharacter.position);
       const userСoordinates = getXY(characterUser.position);
-      const dx = warСoordinates[0] - userСoordinates[0];
-      const dy = warСoordinates[1] - userСoordinates[1];
-      if (Math.abs(dx) <= 1 && Math.abs(dy) > 1) {
-        warСoordinates[1] -= Math.min(Math.abs(dy), this.selectCharacter.speed) * dy / Math.abs(dy);
-        if (warСoordinates[1] === userСoordinates[1] && dx === 0) {
-          warСoordinates[1] += dy / Math.abs(dy);
-        }
-      }
-      if (Math.abs(dy) <= 1 && Math.abs(dx) > 1) {
-        warСoordinates[0] -= Math.min(Math.abs(dx), this.selectCharacter.speed) * dx / Math.abs(dx);
-        if (warСoordinates[0] === userСoordinates[0] && dy === 0) {
-          warСoordinates[0] += dx / Math.abs(dx);
-        }
-      }
-      if (Math.abs(dx) > 1 && Math.abs(dy) > 1) {
-        const maxStep = Math.min(Math.abs(dx), Math.abs(dy), this.selectCharacter.speed);
-        if (maxStep === this.selectCharacter.speed) {
-          warСoordinates[0] -= maxStep * dx / Math.abs(dx);
-          warСoordinates[1] -= maxStep * dy / Math.abs(dy);
-        } else if (Math.abs(dx) > Math.abs(dy)) {
-          warСoordinates[0] -= dy * dx / Math.abs(dx);
-          warСoordinates[1] -= dy * dy / Math.abs(dy);
+      let target = userСoordinates[0] + userСoordinates[1] * 8 + 1;
+      let vector = 1;
+      let step = 1;
+      let i = 0;
+      // eslint-disable-next-line max-len
+      while (!canWalk(this.selectCharacter, target) || this.targetChar(target) || userСoordinates[0] > 7 || userСoordinates[0] < 0 || userСoordinates[1] > 7 || userСoordinates[1] < 0) {
+        if (i < step) {
+          switch (vector % 4) {
+            case 0:
+              userСoordinates[0] += 1;
+              break;
+            case 1:
+              userСoordinates[1] += 1;
+              break;
+            case 2:
+              userСoordinates[0] -= 1;
+              break;
+            case 3:
+              userСoordinates[1] -= 1;
+              break;
+            default:
+              break;
+          }
+          i += 1;
+          target = userСoordinates[0] + userСoordinates[1] * 8;
         } else {
-          warСoordinates[0] -= dx * dx / Math.abs(dx);
-          warСoordinates[1] -= dx * dy / Math.abs(dy);
+          step += 1;
+          vector += 1;
+          i = 0;
         }
-        if (warСoordinates[0] === userСoordinates[0] && warСoordinates[1] === userСoordinates[1]) {
-          warСoordinates[0] += dx / Math.abs(dx);
-          warСoordinates[1] += dy / Math.abs(dy);
-        }
+        console.log(getXY(target));
       }
-      const target = warСoordinates[0] + warСoordinates[1] * 8;
       this.moved(target);
     }
+    this.block = false;
   }
 
   nextLevel() {
